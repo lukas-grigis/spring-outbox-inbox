@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: barista
+  datasource:
+    url: jdbc:postgresql://localhost:5432/barista
+    username: barista
+    password: barista
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/barista.sql
+  modulith:
+    events:
+      jdbc:
+        schema-initialization:
+          enabled: true
+      # A crash leaves PUBLISHED or PROCESSING rows; once stale they turn FAILED and OutboxRelay resubmits them.
+      # Must stay above barista.send-timeout, or a slow send is resent while it is still on its way.
+      staleness:
+        published: 15s
+        processing: 15s
+        resubmitted: 15s
+        check-interval: 5s
+
+barista:
+  resubmit-interval: 5s
+
+server:
+  port: 8081

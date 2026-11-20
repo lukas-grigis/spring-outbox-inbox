@@ -1,0 +1,182 @@
+prologue: after-commit + naive, one sale, barista-1 halts between commit and send
+POST /api/sales → no response (RemoteDisconnected)
+halt(137) barista-1 at after-commit-before-send, sale 5316f676-25b9-4dd9-96c6-f7f53cf41178
+barista-1 restarted without the crash point
+barista-db  sales  with sale_id 5316f676-25b9-4dd9-96c6-f7f53cf41178: 1
+loyalty-db  stamps with sale_id 5316f676-25b9-4dd9-96c6-f7f53cf41178: 0 (loyalty up, queue depth 0)
+committed, never sent, and nothing in this version sends it again
+
+after-commit+naive · seed 42 · expect lost > 0
+chaos  t+5.9 s settle-lost loyalty-2 · t+6.0 s confirm-lost barista-1 · t+8.0 s kill -9 barista-1 · t+12.7 s confirm-
+       lost barista-2 · t+19.8 s SIGKILL rabbitmq · t+22.7 s settle-lost loyalty-1 · t+28.7 s kill -9 loyalty-1 ·
+       t+36.2 s kill -9 loyalty-1
+crash  after-commit-before-send p=0.0025 · after-commit-before-settle p=0.0025
+t+0.6 s committed 5 | in queue 0 | stamped 10 | duplicates 0 | chaos 0
+t+1.7 s halt(137) barista-2 at after-commit-before-send, sale 6e39620d-d5d9-4ab9-92dd-f41bf85cc915
+t+3.3 s halt(137) loyalty-2 at after-commit-before-settle, message 5b7b175c-5f25-4953-81d1-b746d186792b
+t+5.9 s settle-lost on loyalty-2 (6 s)
+t+6.0 s confirm-lost on barista-1 (6 s)
+t+6.1 s committed 130 | in queue 0 | stamped 133 | duplicates 1 | chaos 2
+t+7.1 s halt(137) barista-2 at after-commit-before-send, sale 57dd42dd-3887-441b-bccd-9c2e1df2aebd
+t+8.0 s kill -9 barista-1
+t+11.2 s committed 198 | in queue 0 | stamped 197 | duplicates 1 | chaos 3
+t+12.2 s halt(137) loyalty-1 at after-commit-before-settle, message 182fa13c-f856-4ab8-aa56-071a854a4f3b
+t+12.7 s confirm-lost on barista-2 (6 s)
+t+16.3 s committed 291 | in queue 44 | stamped 211 | duplicates 1 | chaos 4
+t+20.1 s SIGKILL rabbitmq
+t+22.3 s committed 478 | in queue ? | stamped 329 | duplicates 2 | chaos 5
+t+22.7 s settle-lost on loyalty-1 (6 s)
+t+27.8 s rabbitmq healthy
+t+28.7 s kill -9 loyalty-1
+t+28.8 s committed 727 | in queue 0 | stamped 462 | duplicates 2 | chaos 7
+t+29.8 s halt(137) barista-1 at after-commit-before-send, sale 9f78316b-817d-4e2e-b562-46923058c7bd
+t+29.8 s halt(137) barista-2 at after-commit-before-send, sale 8885e334-107e-40e4-9184-45b8aa575275
+t+34.3 s committed 772 | in queue 0 | stamped 501 | duplicates 2 | chaos 7
+t+36.2 s kill -9 loyalty-1
+t+40.3 s halt(137) barista-1 at after-commit-before-send, sale ef4ae5f2-8680-482a-bf28-134410f06dfa
+t+41.0 s committed 989 | in queue 0 | stamped 718 | duplicates 2 | chaos 8
+t+47.4 s committed 1193 | in queue 0 | stamped 925 | duplicates 2 | chaos 8
+t+50.0 s drain
+t+53.6 s committed 1316 | in queue 0 | stamped 1044 | duplicates 2 | chaos 8
+committed 1316 · lost 274 · ghosts 0 · double-applied 2 · duplicates delivered 2 · hash mismatch 0
+[ OK ] lost > 0 (274)
+[ OK ] every eligible crash point fired (after-commit-before-send 5, after-commit-before-settle 2)
+[ OK ] every chaos action ran without error (8 of 8, 0 kills found the instance down)
+[ OK ] drained within 120 s (8.3 s, queue 0, incomplete publications 0)
+
+in-transaction+naive · seed 42 · expect ghosts > 0
+chaos  t+5.9 s settle-lost loyalty-2 · t+6.0 s confirm-lost barista-1 · t+8.0 s kill -9 barista-1 · t+12.7 s confirm-
+       lost barista-2 · t+19.8 s SIGKILL rabbitmq · t+22.7 s settle-lost loyalty-1 · t+28.7 s kill -9 loyalty-1 ·
+       t+36.2 s kill -9 loyalty-1
+crash  after-send-before-commit p=0.0025 · after-commit-before-settle p=0.0025
+t+0.7 s committed 3 | in queue 0 | stamped 10 | duplicates 0 | chaos 0
+t+1.7 s halt(137) barista-2 at after-send-before-commit, sale 97b70323-75f8-4c4d-a574-df3f06c2d35d
+t+3.3 s halt(137) loyalty-2 at after-commit-before-settle, message c714bf2f-5993-44ff-81fd-476db9337e79
+t+5.9 s settle-lost on loyalty-2 (6 s)
+t+6.0 s confirm-lost on barista-1 (6 s)
+t+6.2 s committed 129 | in queue 0 | stamped 133 | duplicates 1 | chaos 2
+t+7.2 s halt(137) barista-2 at after-send-before-commit, sale bac6700f-b01a-4dba-89ee-a5a8fe08dfff
+t+8.0 s kill -9 barista-1
+t+11.3 s committed 157 | in queue 0 | stamped 170 | duplicates 1 | chaos 3
+t+12.7 s confirm-lost on barista-2 (6 s)
+t+13.9 s halt(137) loyalty-1 at after-commit-before-settle, message 59bb7d00-7edf-4d37-9ff7-f040b68559ad
+t+15.7 s halt(137) barista-1 at after-send-before-commit, sale 5ad89d69-c2bd-4974-a1ae-6310b26107bb
+t+16.4 s committed 265 | in queue 5 | stamped 211 | duplicates 1 | chaos 4
+t+20.1 s SIGKILL rabbitmq
+t+22.7 s settle-lost on loyalty-1 (6 s)
+t+22.9 s committed 267 | in queue ? | stamped 292 | duplicates 2 | chaos 6
+t+27.8 s rabbitmq healthy
+t+28.7 s kill -9 loyalty-1
+t+29.5 s committed 384 | in queue 79 | stamped 413 | duplicates 2 | chaos 7
+t+32.2 s halt(137) barista-1 at after-send-before-commit, sale 051a74f0-5b2c-4a2a-9a85-5ce305f52ee8
+t+36.1 s committed 563 | in queue 0 | stamped 591 | duplicates 2 | chaos 7
+t+36.2 s kill -9 loyalty-1
+t+42.1 s halt(137) barista-2 at after-send-before-commit, sale dd74a667-e3de-49a1-86c8-49bb2b620511
+t+42.7 s committed 803 | in queue 0 | stamped 832 | duplicates 2 | chaos 8
+t+47.9 s committed 940 | in queue 0 | stamped 972 | duplicates 2 | chaos 8
+t+50.5 s drain
+t+54.1 s committed 1049 | in queue 0 | stamped 1076 | duplicates 2 | chaos 8
+committed 1049 · lost 0 · ghosts 25 · double-applied 2 · duplicates delivered 2 · hash mismatch 0
+[ OK ] ghosts > 0 (25)
+[ OK ] every eligible crash point fired (after-send-before-commit 5, after-commit-before-settle 2)
+[ OK ] every chaos action ran without error (8 of 8, 0 kills found the instance down)
+[ OK ] drained within 120 s (8.3 s, queue 0, incomplete publications 0)
+
+outbox+naive · seed 42 · expect double-applied > 0
+chaos  t+5.9 s settle-lost loyalty-2 · t+6.0 s confirm-lost barista-1 · t+8.0 s kill -9 barista-1 · t+12.7 s confirm-
+       lost barista-2 · t+19.8 s SIGKILL rabbitmq · t+22.7 s settle-lost loyalty-1 · t+28.7 s kill -9 loyalty-1 ·
+       t+36.2 s kill -9 loyalty-1
+crash  after-accept-before-complete p=0.002 · after-commit-before-settle p=0.0025
+t+0.7 s committed 5 | in queue 0 | stamped 11 | duplicates 0 | chaos 0
+t+1.7 s halt(137) barista-2 at after-accept-before-complete, sale 005e96c7-a2df-4e93-8f0b-9d98387244ec
+t+3.3 s halt(137) loyalty-2 at after-commit-before-settle, message 1bd6c631-3400-4620-b37f-46ff185b98b3
+t+5.9 s settle-lost on loyalty-2 (6 s)
+t+6.0 s committed 129 | in queue 0 | stamped 132 | duplicates 1 | chaos 1
+t+6.0 s confirm-lost on barista-1 (6 s)
+t+7.0 s halt(137) barista-2 at after-accept-before-complete, sale ea2d377e-f9d4-40b0-a952-d33f05afd406
+t+8.0 s kill -9 barista-1
+t+11.3 s committed 198 | in queue 0 | stamped 167 | duplicates 1 | chaos 3
+t+12.7 s confirm-lost on barista-2 (6 s)
+t+13.9 s halt(137) loyalty-1 at after-commit-before-settle, message 15a1ef2c-b8e6-480c-a30c-a5f2d1f4e9f7
+t+15.7 s halt(137) barista-1 at after-accept-before-complete, sale 8ac34a9a-f918-4306-ab35-c495bd9e10a8
+t+16.4 s committed 369 | in queue 8 | stamped 211 | duplicates 1 | chaos 4
+t+20.1 s SIGKILL rabbitmq
+t+22.7 s settle-lost on loyalty-1 (6 s)
+t+22.9 s committed 498 | in queue ? | stamped 287 | duplicates 2 | chaos 6
+t+27.8 s rabbitmq healthy
+t+28.0 s committed 609 | in queue 74 | stamped 499 | duplicates 20 | chaos 6
+t+28.7 s kill -9 loyalty-1
+t+29.0 s halt(137) barista-1 at after-accept-before-complete, sale fac1592c-2e58-4cb7-8e5b-bf1962315de2
+t+33.4 s committed 727 | in queue 0 | stamped 752 | duplicates 21 | chaos 7
+t+36.2 s kill -9 loyalty-1
+t+40.0 s committed 992 | in queue 0 | stamped 1016 | duplicates 21 | chaos 8
+t+46.5 s committed 1251 | in queue 0 | stamped 1275 | duplicates 21 | chaos 8
+t+50.9 s drain
+t+53.9 s halt(137) barista-2 at after-accept-before-complete, sale 56e839b0-f25a-4bf7-b2ec-54dbcfbe5c18
+t+54.6 s committed 1412 | in queue 0 | stamped 1436 | duplicates 24 | chaos 8
+t+62.9 s committed 1412 | in queue 0 | stamped 1436 | duplicates 24 | chaos 8
+t+71.2 s committed 1412 | in queue 0 | stamped 1437 | duplicates 25 | chaos 8
+committed 1412 · lost 0 · ghosts 0 · double-applied 25 · duplicates delivered 25 · hash mismatch 0
+[ OK ] double-applied > 0 (25)
+[ OK ] every eligible crash point fired (after-accept-before-complete 5, after-commit-before-settle 2)
+[ OK ] every chaos action ran without error (8 of 8, 0 kills found the instance down)
+[ OK ] drained within 120 s (24.9 s, queue 0, incomplete publications 0)
+
+outbox+inbox · seed 42 · expect lost = ghosts = double-applied = hash mismatch = 0
+chaos  t+5.9 s settle-lost loyalty-2 · t+6.0 s confirm-lost barista-1 · t+8.0 s kill -9 barista-1 · t+12.7 s confirm-
+       lost barista-2 · t+19.8 s SIGKILL rabbitmq · t+22.7 s settle-lost loyalty-1 · t+28.7 s kill -9 loyalty-1 ·
+       t+36.2 s kill -9 loyalty-1
+crash  after-accept-before-complete p=0.002 · after-commit-before-settle p=0.0025
+t+0.8 s committed 6 | in queue 0 | stamped 11 | duplicates 0 | chaos 0
+t+1.8 s halt(137) barista-2 at after-accept-before-complete, sale 58c30f3c-2dc7-4302-8757-733c124243d4
+t+3.4 s halt(137) loyalty-2 at after-commit-before-settle, message a31913e2-e914-40fe-9c30-5feaa15a3847
+t+5.9 s settle-lost on loyalty-2 (6 s)
+t+6.0 s confirm-lost on barista-1 (6 s)
+t+6.1 s committed 132 | in queue 1 | stamped 134 | duplicates 1 | chaos 2
+t+7.1 s halt(137) barista-2 at after-accept-before-complete, sale f3f6069f-c153-4657-811f-205d72cdbf7a
+t+8.0 s kill -9 barista-1
+t+11.2 s committed 199 | in queue 0 | stamped 167 | duplicates 1 | chaos 3
+t+12.7 s confirm-lost on barista-2 (6 s)
+t+13.9 s halt(137) loyalty-1 at after-commit-before-settle, message cfa18d65-d77e-4e3d-850f-ea0a3af58366
+t+15.8 s halt(137) barista-1 at after-accept-before-complete, sale 9a32aa22-ddcd-4b58-a38e-3315168188b9
+t+16.7 s committed 376 | in queue 29 | stamped 210 | duplicates 1 | chaos 4
+t+20.1 s SIGKILL rabbitmq
+t+22.7 s settle-lost on loyalty-1 (6 s)
+t+23.0 s committed 501 | in queue ? | stamped 288 | duplicates 2 | chaos 6
+t+27.8 s rabbitmq healthy
+t+28.1 s committed 613 | in queue 77 | stamped 457 | duplicates 20 | chaos 6
+t+28.7 s kill -9 loyalty-1
+t+29.1 s halt(137) barista-1 at after-accept-before-complete, sale d013a537-af7e-4e6b-ab43-16b47f814a16
+t+33.5 s committed 732 | in queue 0 | stamped 735 | duplicates 21 | chaos 7
+t+36.2 s kill -9 loyalty-1
+t+40.1 s committed 998 | in queue 0 | stamped 1001 | duplicates 21 | chaos 8
+t+46.6 s committed 1261 | in queue 0 | stamped 1264 | duplicates 21 | chaos 8
+t+50.9 s drain
+t+53.9 s halt(137) barista-2 at after-accept-before-complete, sale da194beb-b839-4782-aea8-e35ab2d9e07f
+t+54.5 s committed 1415 | in queue 0 | stamped 1415 | duplicates 24 | chaos 8
+t+63.0 s committed 1415 | in queue 0 | stamped 1415 | duplicates 24 | chaos 8
+t+71.4 s committed 1415 | in queue 0 | stamped 1415 | duplicates 25 | chaos 8
+committed 1415 · lost 0 · ghosts 0 · double-applied 0 · duplicates delivered 25 · hash mismatch 0
+[ OK ] every eligible crash point fired (after-accept-before-complete 5, after-commit-before-settle 2)
+[ OK ] every chaos action ran without error (8 of 8, 0 kills found the instance down)
+[ OK ] drained within 120 s (25.3 s, queue 0, incomplete publications 0)
+[ OK ] lost = ghosts = double-applied = hash mismatch = 0, parking queue empty (0)
+[ OK ] the inbox suppressed a broker redelivery (2 of 25 suppressed duplicates had a delivery count above 0)
+[ OK ] cups sold = stamps in loyalty-db (2828 = 2828)
+
+| scenario             | committed | lost | ghosts | double-applied | duplicates delivered | hash mismatch | gates |
+| -------------------- | --------- | ---- | ------ | -------------- | -------------------- | ------------- | ----- |
+| after-commit+naive   | 1316      | 274  | 0      | 2              | 2                    | 0             | ok    |
+| in-transaction+naive | 1049      | 0    | 25     | 2              | 2                    | 0             | ok    |
+| outbox+naive         | 1412      | 0    | 0      | 25             | 25                   | 0             | ok    |
+| outbox+inbox         | 1415      | 0    | 0      | 0              | 25                   | 0             | ok    |
+
+Seeds of the last row, same load and chaos recipe (n = 3). Seed 42 is the last row of the table above, the others come from `mise run scenario -- outbox+inbox --seed N`. The seed fixes the chaos schedule and the crash draws, not the timing, so the duplicate counts differ.
+
+| seed | committed | lost | ghosts | double-applied | duplicates delivered | hash mismatch | gates |
+| ---- | --------- | ---- | ------ | -------------- | -------------------- | ------------- | ----- |
+| 42   | 1415      | 0    | 0      | 0              | 25                   | 0             | ok    |
+| 43   | 1107      | 0    | 0      | 0              | 9                    | 0             | ok    |
+| 44   | 1691      | 0    | 0      | 0              | 29                   | 0             | ok    |
+
+runtime 6 min 2 s · results in results/ and README.md · infrastructure stays up, mise run infra:down stops it

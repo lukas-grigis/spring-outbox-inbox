@@ -1,0 +1,80 @@
+{
+  "scenario": "outbox+inbox",
+  "seed": 42,
+  "cells": {
+    "committed": 1415,
+    "lost": 0,
+    "ghosts": 0,
+    "double-applied": 0,
+    "duplicates delivered": 25,
+    "hash mismatch": 0
+  },
+  "gates": {
+    "every eligible crash point fired (after-accept-before-complete 5, after-commit-before-settle 2)": true,
+    "every chaos action ran without error (8 of 8, 0 kills found the instance down)": true,
+    "drained within 120 s (25.3 s, queue 0, incomplete publications 0)": true,
+    "lost = ghosts = double-applied = hash mismatch = 0, parking queue empty (0)": true,
+    "the inbox suppressed a broker redelivery (2 of 25 suppressed duplicates had a delivery count above 0)": true,
+    "cups sold = stamps in loyalty-db (2828 = 2828)": true
+  },
+  "crash_points_fired": {
+    "after-accept-before-complete": 5,
+    "after-commit-before-settle": 2
+  },
+  "chaos": [
+    {
+      "t": 5.9,
+      "action": "settle-lost",
+      "target": "loyalty-2"
+    },
+    {
+      "t": 6.0,
+      "action": "confirm-lost",
+      "target": "barista-1"
+    },
+    {
+      "t": 8.0,
+      "action": "kill -9",
+      "target": "barista-1"
+    },
+    {
+      "t": 12.7,
+      "action": "confirm-lost",
+      "target": "barista-2"
+    },
+    {
+      "t": 19.8,
+      "action": "SIGKILL",
+      "target": "rabbitmq"
+    },
+    {
+      "t": 22.7,
+      "action": "settle-lost",
+      "target": "loyalty-1"
+    },
+    {
+      "t": 28.7,
+      "action": "kill -9",
+      "target": "loyalty-1"
+    },
+    {
+      "t": 36.2,
+      "action": "kill -9",
+      "target": "loyalty-1"
+    }
+  ],
+  "drain": {
+    "seconds": 25.3,
+    "queued": 0,
+    "incomplete_publications": 0,
+    "drained": true
+  },
+  "timeline": {
+    "bucket_seconds": 1,
+    "committed": [40, 21, 20, 20, 20, 29, 28, 20, 1, 0, 7, 20, 37, 40, 40, 33, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 26, 20, 20, 20, 20, 34, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 39],
+    "stamped": [40, 21, 20, 20, 20, 29, 17, 0, 0, 0, 7, 20, 16, 0, 0, 0, 0, 42, 34, 2, 0, 0, 0, 0, 0, 20, 111, 99, 19, 21, 19, 121, 37, 40, 40, 39, 41, 40, 40, 40, 40, 40, 40, 39, 41, 40, 40, 41, 39, 40],
+    "lost": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "ghosts": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    "double_applied": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  }
+}

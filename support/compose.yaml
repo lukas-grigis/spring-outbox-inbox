@@ -1,0 +1,68 @@
+name: spring-outbox-inbox
+
+services:
+  rabbitmq:
+    image: rabbitmq:4.4.1-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/conf.d/20-outbox-inbox.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_running"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  barista-db:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_USER: barista
+      POSTGRES_PASSWORD: barista
+      POSTGRES_DB: barista
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barista -d barista"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+      start_period: 5s
+
+  loyalty-db:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_USER: loyalty
+      POSTGRES_PASSWORD: loyalty
+      POSTGRES_DB: loyalty
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U loyalty -d loyalty"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+      start_period: 5s
+
+  # One proxy per app instance, so a toxic hits exactly one connection.
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.13.0
+    command: ["-host=0.0.0.0", "-config=/config/toxiproxy.json"]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8474:8474"
+      - "21001:21001"
+      - "21002:21002"
+      - "21011:21011"
+      - "21012:21012"
+    volumes:
+      - ./toxiproxy/toxiproxy.json:/config/toxiproxy.json:ro
+    healthcheck:
+      test: ["CMD", "/toxiproxy-cli", "list"]
+      interval: 3s
+      timeout: 3s
+      retries: 10

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: loyalty
+  datasource:
+    url: jdbc:postgresql://localhost:5433/loyalty
+    username: loyalty
+    password: loyalty
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: classpath:db/loyalty.sql
+
+server:
+  port: 8091

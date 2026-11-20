@@ -1,0 +1,6 @@
+[
+  {"name": "barista-1", "listen": "0.0.0.0:21001", "upstream": "rabbitmq:5672", "enabled": true},
+  {"name": "barista-2", "listen": "0.0.0.0:21002", "upstream": "rabbitmq:5672", "enabled": true},
+  {"name": "loyalty-1", "listen": "0.0.0.0:21011", "upstream": "rabbitmq:5672", "enabled": true},
+  {"name": "loyalty-2", "listen": "0.0.0.0:21012", "upstream": "rabbitmq:5672", "enabled": true}
+]

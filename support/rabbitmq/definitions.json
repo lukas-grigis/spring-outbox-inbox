@@ -1,0 +1,43 @@
+{
+  "rabbit_version": "4.4.1",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "6AcT9np0Vmqs8Z8DYiFJ+2ZkuDGN/1I9mr8Ee1bCM+qx+LJl",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ]
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "policies": [
+    {
+      "vhost": "/",
+      "name": "loyalty-coffee-sold",
+      "pattern": "^loyalty\\.coffee-sold$",
+      "apply-to": "queues",
+      "priority": 0,
+      "definition": {
+        "dead-letter-exchange": "",
+        "dead-letter-routing-key": "loyalty.coffee-sold.failed",
+        "delivery-limit": 20,
+        "overflow": "reject-publish",
+        "dead-letter-strategy": "at-least-once"
+      }
+    }
+  ]
+}
