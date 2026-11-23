@@ -1,7 +1,1 @@
-{
-  "messageId": "0b9f2c1e-6d3a-4c58-9a47-3e1d5b7f8a20",
-  "saleId": "7c1e4a92-58d0-4b6f-a3e1-92f4c0d6b815",
-  "cardId": "Café-42",
-  "cups": 3,
-  "soldAt": "2026-01-15T10:30:00.123456Z"
-}
+{"messageId":"0b9f2c1e-6d3a-4c58-9a47-3e1d5b7f8a20","saleId":"7c1e4a92-58d0-4b6f-a3e1-92f4c0d6b815","cardId":"Café-42","cups":3,"soldAt":"2026-01-15T10:30:00.123456Z"}

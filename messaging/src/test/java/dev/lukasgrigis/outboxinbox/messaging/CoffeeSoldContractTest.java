@@ -44,13 +44,13 @@ class CoffeeSoldContractTest {
     void encodesToTheGoldenFixtureBytes() throws IOException {
         final var message = converter.toMessage(FIXTURE, new MessageProperties());
 
-        assertThat(message.getBody()).isEqualTo(fixture());
+        assertThat(message.getBody()).as("contract/coffee-sold.json is pinned byte for byte; an IDE reformat breaks it, restore the one-line file").isEqualTo(fixture());
         assertThat(message.getMessageProperties().getContentType()).isEqualTo(MessageProperties.CONTENT_TYPE_JSON);
     }
 
     @Test
     void goldenFixtureHashIsPinned() throws IOException {
-        assertThat(ContentHash.of(fixture())).isEqualTo(FIXTURE_SHA256);
+        assertThat(ContentHash.of(fixture())).as("contract/coffee-sold.json is pinned byte for byte; an IDE reformat breaks it, restore the one-line file").isEqualTo(FIXTURE_SHA256);
     }
 
     @Test
