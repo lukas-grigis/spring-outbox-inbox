@@ -16,6 +16,8 @@
   versions that lose, invent or double-apply messages.
 </p>
 
+<p align="center"><a href="https://lukasgrigis.dev/blog/spring-boot-outbox-inbox/"><strong>Read the companion blog post &rarr;</strong></a></p>
+
 Three things this repo established against a live server, each pinned by a test:
 
 - A listener that throws is **released** by Spring's default container, and since RabbitMQ 4.3 a release does not
